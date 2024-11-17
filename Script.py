@@ -41,9 +41,9 @@ Eg:- `/set_cap
 
     ABOUT_TXT = """<b>╔════❰ ᴀᴜᴛᴏ ᴄᴀᴘᴛɪᴏɴ ʙᴏᴛ ❱═❍⊱❁
 ║╭━━━━━━━━━━━━━━━➣
-║┣⪼📃ʙᴏᴛ : <a href='https://t.me/CustomCaptionBot'>Auto Caption</a>
-║┣⪼👦Cʀᴇᴀᴛᴏʀ : <a href='https://t.me/Silicon_Official'>Sɪʟɪᴄᴏɴ Dᴇᴠᴇʟᴏᴘᴇʀ ⚠️</a>
-║┣⪼🤖Uᴘᴅᴀᴛᴇ : <a href='https://t.me/Silicon_Bot_Update'>Sɪʟɪᴄᴏɴ Bᴏᴛᴢ™</a>
+║┣⪼📃ʙᴏᴛ : <a href='https://t.me/RxAutoCaptionBot'>ᴀᴜᴛᴏ Cᴀᴘᴛɪᴏɴ ✨</a>
+║┣⪼👦Cʀᴇᴀᴛᴏʀ : <a href='https://t.me/RxBotz'>ʀ'x ʙᴏᴛᴢ ⚠️</a>
+║┣⪼🤖Uᴘᴅᴀᴛᴇ : <a href='https://t.me/RxBotz'>ʀ'x ʙᴏᴛᴢ™</a>
 ║┣⪼📡Hᴏsᴛᴇᴅ ᴏɴ : ʜᴇʀᴏᴋᴜ 
 ║┣⪼🗣️Lᴀɴɢᴜᴀɢᴇ : Pʏᴛʜᴏɴ3
 ║┣⪼📚Lɪʙʀᴀʀʏ : Pʏʀᴏɢʀᴀᴍ 2.11.6
