@@ -20,7 +20,7 @@ API_ID = int(getenv("API_ID", ""))
 API_HASH = str(getenv("API_HASH", ""))
 BOT_TOKEN = str(getenv("BOT_TOKEN", ""))
 FORCE_SUB = os.environ.get("FORCE_SUB", "Rxbotz") 
-MONGO_DB = str(getenv("MONGO_DB", "mongodb+srv://isha1470:rvi2uo5wacfGVSqB@cluster0.fvezv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_DB = str(getenv("MONGO_DB", "mongodb+srv://isha1470:rvi2uo5wacfGVSqB@cluster0.fvezv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
 DEF_CAP = str(
     getenv(
         "DEF_CAP",
