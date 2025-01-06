@@ -6,6 +6,9 @@ from .database import *
 import re
 from pyrogram.errors import FloodWait
 from pyrogram.types import *
+import time
+import os
+import sys
 
 @Client.on_message(filters.command("start") & filters.private)
 async def strtCap(bot, message):
@@ -29,8 +32,8 @@ async def strtCap(bot, message):
         reply_markup=keyboard
     )
 
-@Client.on_message(filters.private & filters.user(ADMIN)  & filters.command(["total_users"]))
-async def all_db_users_here(client,message):
+@Client.on_message(filters.private & filters.user(ADMIN) & filters.command(["total_users"]))
+async def all_db_users_here(client, message):
     silicon = await message.reply_text("Please Wait....")
     silicon_botz = await total_user()
     await silicon.edit(f"Tᴏᴛᴀʟ Usᴇʀ :- `{silicon_botz}`")
@@ -52,10 +55,10 @@ async def broadcast(bot, message):
                 await message.reply_to_message.copy(user['_id'])
                 success += 1
             except errors.InputUserDeactivated:
-                deactivated +=1
+                deactivated += 1
                 await delete({"_id": user['_id']})
             except errors.UserIsBlocked:
-                blocked +=1
+                blocked += 1
                 await delete({"_id": user['_id']})
             except Exception as e:
                 failed += 1
@@ -64,7 +67,7 @@ async def broadcast(bot, message):
             try:
                 await silicon.edit(f"<u>ʙʀᴏᴀᴅᴄᴀsᴛ ᴘʀᴏᴄᴇssɪɴɢ</u>\n\n• ᴛᴏᴛᴀʟ ᴜsᴇʀs: {tot}\n• sᴜᴄᴄᴇssғᴜʟ: {success}\n• ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs: {blocked}\n• ᴅᴇʟᴇᴛᴇᴅ ᴀᴄᴄᴏᴜɴᴛs: {deactivated}\n• ᴜɴsᴜᴄᴄᴇssғᴜʟ: {failed}")
             except FloodWait as e:
-                await asyncio.sleep(t.x)
+                await asyncio.sleep(e.x)
         await silicon.edit(f"<u>ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ</u>\n\n• ᴛᴏᴛᴀʟ ᴜsᴇʀs: {tot}\n• sᴜᴄᴄᴇssғᴜʟ: {success}\n• ʙʟᴏᴄᴋᴇᴅ ᴜsᴇʀs: {blocked}\n• ᴅᴇʟᴇᴛᴇᴅ ᴀᴄᴄᴏᴜɴᴛs: {deactivated}\n• ᴜɴsᴜᴄᴄᴇssғᴜʟ: {failed}")
 
 @Client.on_message(filters.private & filters.user(ADMIN) & filters.command("restart"))
@@ -96,32 +99,33 @@ async def setCap(bot, message):
 async def delCap(_, msg):
     chnl_id = msg.chat.id
     try:
-        await chnl_ids.delete_one({"chnl_id": chnl_id})
-        return await msg.reply("<b><i>✓ Sᴜᴄᴄᴇssғᴜʟʟʏ... Dᴇʟᴇᴛᴇᴅ Yᴏᴜʀ Cᴀᴘᴛɪᴏɴ Nᴏᴡ I ᴀᴍ Usɪɴɢ Mʏ Dᴇғᴀᴜʟᴛ Cᴀᴘᴛɪᴏɴ </i></b>")
-    except Exception as e:
-        e_val = await msg.replay(f"ERR I GOT: {e}")
-        await asyncio.sleep(5)
-        await e_val.delete()
-        return
+        await delCapData(chnl_id)
+        return await msg.reply("Your caption has been deleted.")
+    except:
+        return await msg.reply("You don't have a caption set.")
 
-@Client.on_message(filters.command("view") & filters.channel)
-async def viewCap(_, msg):
-    chnl_id = msg.chat.id
-    cap_data = await chnl_ids.find_one({"chnl_id": chnl_id})
-    if cap_data:
-        return await msg.reply(f"Current Caption: {cap_data['caption']}")
-    else:
-        return await msg.reply("No custom caption found for this channel.")
-
+# Replace Words functionality
 @Client.on_message(filters.command("replace_words") & filters.channel)
 async def replaceWords(bot, msg):
     chnl_id = msg.chat.id
     if len(msg.command) < 2:
-        return await msg.reply("Usage: /replace_words [original_word] (replacement_word), [original_word_2] (replacement_word_2)")
+        return await msg.reply("Usage: /replace_words [original_word] (replacement_word), [original_word2] (replacement_word2)")
     replace_data = msg.text.split(" ", 1)[1]
-    if replace_data:
-        await add_replace_words(chnl_id, replace_data)
-        return await msg.reply(f"Words replaced: {replace_data}")
+    
+    # Parse the words and replacements from the input
+    replace_pairs = [pair.split(")") for pair in replace_data.split(",")]
+    replace_dict = {}
+    
+    for pair in replace_pairs:
+        if len(pair) == 2:
+            original_word = pair[0].strip(" [").strip()
+            replacement_word = pair[1].strip(" (").strip()
+            replace_dict[original_word] = replacement_word
+
+    if replace_dict:
+        # Save the replacements to the database
+        await add_replace_words(chnl_id, replace_dict)
+        return await msg.reply(f"Words replaced: {', '.join([f'{k} -> {v}' for k, v in replace_dict.items()])}")
     else:
         return await msg.reply("No replacement data provided.")
 
@@ -131,20 +135,26 @@ async def delReplaceWord(_, msg):
     await del_replace_words(chnl_id)
     return await msg.reply("All replacement words have been deleted.")
 
+# Remove Words functionality
 @Client.on_message(filters.command("rem_words") & filters.channel)
 async def remWords(bot, msg):
     chnl_id = msg.chat.id
     if len(msg.command) < 2:
-        return await msg.reply("Usage: /rem_words [word_to_remove]")
-    word_to_remove = msg.text.split(" ", 1)[1]
-    await remove_word(chnl_id, word_to_remove)
-    return await msg.reply(f"Word '{word_to_remove}' removed successfully.")
+        return await msg.reply("Usage: /rem_words [word_to_remove] [word2_to_remove] ...")
+    words_to_remove = msg.text.split(" ", 1)[1].split()
+    
+    if words_to_remove:
+        await remove_words(chnl_id, words_to_remove)
+        return await msg.reply(f"Words removed: {', '.join(words_to_remove)}")
+    else:
+        return await msg.reply("No words to remove.")
 
 @Client.on_message(filters.command("del_rem_word") & filters.channel)
 async def delRemWords(_, msg):
     chnl_id = msg.chat.id
     await delete_removed_words(chnl_id)
     return await msg.reply("All removed words have been deleted.")
+
 
 # Size conversion function
 def get_size(size):
