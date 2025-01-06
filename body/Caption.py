@@ -14,18 +14,18 @@ async def strtCap(bot, message):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("➕️ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ➕️", url=f"https://t.me/RxAutoCaptionBot?startchannel=true")
+                InlineKeyboardButton("➕️ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ➕️", url=f"https://t.me/CustomCaptionBot?startchannel=true")
             ],[
                 InlineKeyboardButton("Hᴇʟᴘ", callback_data="help"),
                 InlineKeyboardButton("Aʙᴏᴜᴛ", callback_data="about")
             ],[
-                InlineKeyboardButton("🌐 Uᴘᴅᴀᴛᴇ", url=f"https://t.me/RxBotz"),
-                InlineKeyboardButton("📜 Sᴜᴘᴘᴏʀᴛ", url=r"https://t.me/Rxbotz")
-        ]]
+                InlineKeyboardButton("🌐 Uᴘᴅᴀᴛᴇ", url=f"https://t.me/Silicon_Bot_Update"),
+                InlineKeyboardButton("📜 Sᴜᴘᴘᴏʀᴛ", url=r"https://t.me/Silicon_Botz")
+            ]]
     )
     await message.reply_photo(
         photo=SILICON_PIC,
-        caption=f"<b>Hᴇʟʟᴏ {message.from_user.mention}\n\nɪ ᴀᴍ ᴀᴜᴛᴏ ᴄᴀᴘᴛɪᴏɴ ʙᴏᴛ ᴡɪᴛʜ ᴄᴜsᴛᴏᴍ ᴄᴀᴘᴛɪᴏɴ.\n\nFᴏʀ ᴍᴏʀᴇ ɪɴғᴏ ʜᴏᴡ ᴛᴏ ᴜsᴇ ᴍᴇ ᴄʟɪᴄᴋ ᴏɴ ʜᴇʟᴘ ʙᴜᴛᴛᴏɴ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ.\n\nMᴀɪɴᴛᴀɪɴᴇᴅ ʙʏ »<a href='https://t.me/RxBotz'>ʀ'x ʙᴏᴛᴢ</a></b>",
+        caption=f"<b>Hᴇʟʟᴏ {message.from_user.mention}\n\nɪ ᴀᴍ ᴀᴜᴛᴏ ᴄᴀᴘᴛɪᴏɴ ʙᴏᴛ ᴡɪᴛʜ ᴄᴜsᴛᴏᴍ ᴄᴀᴘᴛɪᴏɴ.\n\nFᴏʀ ᴍᴏʀᴇ ɪɴғᴏ ʜᴏᴡ ᴛᴏ ᴜsᴇ ᴍᴇ ᴄʟɪᴄᴋ ᴏɴ ʜᴇʟᴘ ʙᴜᴛᴛᴏɴ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ.\n\nMᴀɪɴᴛᴀɪɴᴇᴅ ʙʏ »<a href='https://t.me/Silicon_Bot_Update'>Sɪʟɪᴄᴏɴ Bᴏᴛᴢ</a></b>",
         reply_markup=keyboard
     )
 
@@ -104,6 +104,58 @@ async def delCap(_, msg):
         await e_val.delete()
         return
 
+@Client.on_message(filters.command("view") & filters.channel)
+async def viewCap(_, msg):
+    chnl_id = msg.chat.id
+    cap_data = await chnl_ids.find_one({"chnl_id": chnl_id})
+    if cap_data:
+        return await msg.reply(f"Current Caption: {cap_data['caption']}")
+    else:
+        return await msg.reply("No custom caption found for this channel.")
+
+@Client.on_message(filters.command("replace_words") & filters.channel)
+async def replaceWords(bot, msg):
+    chnl_id = msg.chat.id
+    if len(msg.command) < 2:
+        return await msg.reply("Usage: /replace_words [original_word] (replacement_word), [original_word_2] (replacement_word_2)")
+    replace_data = msg.text.split(" ", 1)[1]
+    if replace_data:
+        await add_replace_words(chnl_id, replace_data)
+        return await msg.reply(f"Words replaced: {replace_data}")
+    else:
+        return await msg.reply("No replacement data provided.")
+
+@Client.on_message(filters.command("del_replace_word") & filters.channel)
+async def delReplaceWord(_, msg):
+    chnl_id = msg.chat.id
+    await del_replace_words(chnl_id)
+    return await msg.reply("All replacement words have been deleted.")
+
+@Client.on_message(filters.command("rem_words") & filters.channel)
+async def remWords(bot, msg):
+    chnl_id = msg.chat.id
+    if len(msg.command) < 2:
+        return await msg.reply("Usage: /rem_words [word_to_remove]")
+    word_to_remove = msg.text.split(" ", 1)[1]
+    await remove_word(chnl_id, word_to_remove)
+    return await msg.reply(f"Word '{word_to_remove}' removed successfully.")
+
+@Client.on_message(filters.command("del_rem_word") & filters.channel)
+async def delRemWords(_, msg):
+    chnl_id = msg.chat.id
+    await delete_removed_words(chnl_id)
+    return await msg.reply("All removed words have been deleted.")
+
+# Size conversion function
+def get_size(size):
+    units = ["Bytes", "Kʙ", "Mʙ", "Gʙ", "Tʙ", "Pʙ", "Eʙ"]
+    size = float(size)
+    i = 0
+    while size >= 1024.0 and i < len(units) - 1:  # Changed the condition to stop at the last unit
+        i += 1
+        size /= 1024.0
+    return "%.2f %s" % (size, units[i])
+
 def extract_language(default_caption):
     language_pattern = r'\b(Hindi|English|Tamil|Telugu|Malayalam|Kannada|Hin)\b'#Contribute More Language If You Have
     languages = set(re.findall(language_pattern, default_caption, re.IGNORECASE))
@@ -146,29 +198,19 @@ async def reCap(bot, message):
                     continue
     return
 
-# Size conversion function
-def get_size(size):
-    units = ["Bytes", "Kʙ", "Mʙ", "Gʙ", "Tʙ", "Pʙ", "Eʙ"]
-    size = float(size)
-    i = 0
-    while size >= 1024.0 and i < len(units) - 1:  # Changed the condition to stop at the last unit
-        i += 1
-        size /= 1024.0
-    return "%.2f %s" % (size, units[i])
-
 @Client.on_callback_query(filters.regex(r'^start'))
 async def start(bot, query):
     await query.message.edit_text(
         text=script.START_TXT.format(query.from_user.mention),  
         reply_markup=InlineKeyboardMarkup(
             [[
-                InlineKeyboardButton("➕️ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ➕️", url=f"http://t.me/RxAutoCaptionBot?startchannel=true")
+                InlineKeyboardButton("➕️ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ➕️", url=f"http://t.me/CustomCaptionBot?startchannel=true")
                 ],[
                 InlineKeyboardButton("Hᴇʟᴘ", callback_data="help"),
                 InlineKeyboardButton("Aʙᴏᴜᴛ", callback_data="about")
             ],[
-                InlineKeyboardButton("🌐 Uᴘᴅᴀᴛᴇ", url=f"https://t.me/Rxbotz"),
-                InlineKeyboardButton("📜 Sᴜᴘᴘᴏʀᴛ", url=r"https://t.me/Rxbotz")
+                InlineKeyboardButton("🌐 Uᴘᴅᴀᴛᴇ", url=f"https://t.me/Silicon_Bot_Update"),
+                InlineKeyboardButton("📜 Sᴜᴘᴘᴏʀᴛ", url=r"https://t.me/Silicon_Botz")
             ]]
         ),
         disable_web_page_preview=True
@@ -202,5 +244,5 @@ async def about(bot, query):
         ),
         disable_web_page_preview=True 
 
-)
-
+        )
+    
