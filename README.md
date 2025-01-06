@@ -72,7 +72,7 @@ restart - Restart The Bot.
 <h3 align="center">
     ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʀᴇɴᴅᴇʀ 」─
 </h3>
-<p align="center"><a href="https://render.com/deploy?repo=https://github.com/Silicon-Developer/Advance-Caption-Bot">
+<p align="center"><a href="https://render.com/deploy?repo=https://github.com/Rajesh1st/Advance-Caption-Bot">
 <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render">
 </a></p> 
 <h3 align="center">
